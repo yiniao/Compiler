@@ -1,23 +1,26 @@
 #include <iostream>
 #include "Compiler.h"
+#include "Pro.h"
+#include "LexicalAnalyzer.h"
+#include <map>
+#include <stack>
 
 using namespace std;
 
-
-
 int main() {
 
-//    Lex lex("d:\\Test.pas");
+//    Lex lex("e:\\Test.pas");
 //
 //    lex.Execute();
 
-//    SyntaxAnalyzer syntaxAnalyzer("d:\\Test.dyd");
+//    SyntaxAnalyzer syntaxAnalyzer("e:\\Test.dyd");
 //
 //    syntaxAnalyzer.Init();
 //    syntaxAnalyzer.Execute();
 
-    Compiler compiler("d:\\Test.pas");
+    Compiler compiler("e:\\Test.pas");
     compiler.Execute();
+
 
 
 

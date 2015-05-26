@@ -18,12 +18,12 @@ class Lex {
 public:
     Lex(string name)
             : fin_(name, ios::binary), fout_(util::ChangeSuffix(name, LEXICAL_ANALYSIS_SUFFIX)),
-              ferr_(util::ChangeSuffix(name, ERROR_SUFFIX)), character_(' '), token_(" ")
+              ferr_(util::ChangeSuffix(name, ERROR_SUFFIX)), character_(' '), token_(" "), line_num_(1)
     {}
 
     void Execute() {
         while (LexAnalyze());
-
+        fout_ << "   ... EOF " << line_num_;
     }
 
     bool LexAnalyze();
@@ -47,8 +47,17 @@ public:
     }
 
     string ToString(short type_num) {
-        char buf[25];
-        snprintf(buf, 25, "%s  %hd\n",  token_.c_str(), type_num);
+        char buf[40];
+
+        string tmp(16, ' ');
+
+        tmp.replace(tmp.size() - token_.size() - 1, token_.size(), token_);
+
+
+        snprintf(buf, 40, "%s  %hd   ... EOLN %d\n",  tmp.c_str(), type_num, line_num_);
+
+
+
 
         string str(buf);
         return str;
@@ -67,6 +76,11 @@ public:
                || character_ == '\t'
                || character_ == '\r')
         {
+            if (character_ == '\n')
+            {
+                line_num_++;
+            }
+
             if(!GetNextChar())
                 return false;
         }
@@ -119,6 +133,8 @@ private:
 
     char     character_;
     string   token_;
+
+    unsigned int line_num_;
 };
 
 

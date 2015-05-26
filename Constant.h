@@ -15,6 +15,8 @@ const string LEXICAL_ANALYSIS_SUFFIX = "dyd";
 const string GRAMMATICAL_ANALYSIS_SUFFIX = "dys";
 const string ERROR_SUFFIX = "err";
 
+const unsigned int VARIABLE = 0;
+const unsigned int PARAMETER = 1;
 
 const string SYMBOL = "symbol";
 const string CONSTANT = "constant";

@@ -8,11 +8,13 @@
 #include <fstream>
 #include <queue>
 #include <string>
+#include <stack>
 #include <stdlib.h>
 
 
 #include "Util.h"
 #include "Constant.h"
+#include "Pro.h"
 
 using namespace std;
 
@@ -35,13 +37,20 @@ public:
     void Init()
     {
         string line;
+
         while (1) {
             getline(fin_, line);
             if (fin_.eof()) {
                 break;
             }
-            string word = line.substr(0, line.find(' '));
+
+            string tmp = line.substr(line.find_first_not_of(' '));
+            string word = tmp.substr(0, tmp.find(' '));
+
+            string line_num = line.substr(line.rfind(' '));
+
             words_.push(word);
+            line_nums_.push(line_num);
         }
     }
 
@@ -55,10 +64,12 @@ private:
         else {
             cur_word_ = words_.front();
             words_.pop();
+
+            cur_line_num_ = line_nums_.front();
+            line_nums_.pop();
         }
 
     }
-
 
     void NextNotPop()
     {
@@ -67,32 +78,94 @@ private:
         }
         else {
             cur_word_ = words_.front();
+            cur_line_num_ = line_nums_.front();
         }
 
     }
 
     void Error(string info)
     {
-        cout << info << endl;
+        cout << "***LINE:" << cur_line_num_ << "  " << info << endl;
         exit(0);
     }
 
+    void AddPro(string name)
+    {
+        Pro pro;
+        pro.name_ = name;
+        pros_.push(pro);
+    }
 
+    void DelPro()
+    {
+        pros_.pop();
+    }
 
+    Pro& PeekPro()
+    {
+        return pros_.top();
+    }
+
+    void AddVar(unsigned int kind)
+    {
+        for (auto var : PeekPro().vars_)
+        {
+            if (cur_word_ == var.first && var.second.kind_ != PARAMETER)
+            {
+                Error("variable " + cur_word_ + " is redefine");
+            }
+        }
+
+        cur_var_.name_ = cur_word_;
+        cur_var_.kind_ = kind;
+        cur_var_.type_ = 0;
+        PeekPro().vars_.insert(pair<string, Var>(cur_var_.name_, cur_var_));
+    }
+
+    void CheckVar()
+    {
+        if (cur_word_ == PeekPro().name_) {
+            return ;
+        }
+
+        for (auto var : PeekPro().vars_)
+        {
+            if (var.first == cur_word_)
+            {
+                return ;
+            }
+            else {
+                Error("variable " + cur_word_ + " is not define");
+            }
+        }
+    }
+
+    void PrintVars()
+    {
+        for(auto var : PeekPro().vars_)
+        {
+            cout << var.first << endl;
+        }
+    }
 
 private:
-    ifstream            fin_;
-    queue<string>       words_;
+    ifstream           fin_;
+    queue<string>      words_;
+    queue<string>      line_nums_;
     string             cur_word_;
+    string             cur_line_num_;
     char               cur_char_;
 
+    stack<Pro>         pros_;
+    //Pro                cur_pro_;
+    Var                cur_var_;
 
 private:
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                     ÆÕÍ¨ÏÂ½µµÝ¹é·ÖÎö
+    //                     ï¿½ï¿½Í¨ï¿½Â½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½
     //
     ////////////////////////////////////////////////////////////////////////////////////////
     //  Program             -> SubProgram
@@ -142,15 +215,15 @@ private:
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //
-    //                     ÏÂ½µµÝ¹é·ÖÎö---À©³ä BNF
+    //                     ï¿½Â½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½---ï¿½ï¿½ï¿½ï¿½ BNF
     //
     ////////////////////////////////////////////////////////////////////////////////////////
     //  Program             -> SubProgram
     //  SubProgram          -> begin  StatementTable  ;  ExecutionTable  end
     //
     //
-    //  StatementTable      -> Statement {; Statement}                    //Ïû³ý×óµÝ¹é
-    //  Statement           -> integer (Variable | function Symbol ( Parameter ) ;  FunctionBody)  //ÌáÈ¡×ó¹«Òò×Ó
+    //  StatementTable      -> Statement {; Statement}                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¹ï¿½
+    //  Statement           -> integer (Variable | function Symbol ( Parameter ) ;  FunctionBody)  //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //
     //  Variable            -> Symbol
     //  Symbol              -> Letter { Letter | Digit }
@@ -188,13 +261,12 @@ private:
     void ExecutionTable();
 
 
-    //void StatementTableExt();
     void Statement();
 
 
     void Variable();
     void Symbol();
-    //void SymbolExt();
+
     void Letter();
     void Digit();
 
@@ -203,25 +275,15 @@ private:
     void FunctionBody();
     void Parameter();
 
-    //void ExecutionTableExt();
     void Execution();
 
-    void Read();
-    void Write();
-    void Assignment();
-    void Condition();
-
     void ArithmeticExpression();
-    //void ArithmeticExpressionExt();
+
 
     void Term();
-    //void TermExt();
+
     void Factor();
 
-    void Constant();
-    void Call();
-    void UnsignedInteger();
-    //void UnsignedIntegerExt();
 
     void ConditionExpression();
 

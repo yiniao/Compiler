@@ -4,5 +4,6 @@ project(Compiler)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES main.cpp Compiler.h Compiler.cpp Constant.h LexicalAnalyzer.h LexicalAnalyzer.cpp
-                 Util.h Util.cpp SyntaxAnalyzer.h SyntaxAnalyzer.cpp)
+                 Util.h Util.cpp SyntaxAnalyzer.h SyntaxAnalyzer.cpp
+                 Var.h Var.cpp Pro.h Pro.cpp)
 add_executable(Compiler ${SOURCE_FILES})

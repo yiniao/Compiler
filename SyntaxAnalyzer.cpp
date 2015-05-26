@@ -19,12 +19,17 @@ void SyntaxAnalyzer::Program() {
 void SyntaxAnalyzer::SubProgram() {
     Next();
     if (cur_word_ == "begin") {
+
+        AddPro("");
+
         StatementTable();
-        //Next();                                        // <====================
+
         if (cur_word_ == ";") {
             ExecutionTable();
             Next();
             if (cur_word_ == "end") {
+                PrintVars();
+                DelPro();
                 cout << "[INFO] -- Syntax Right !!!" << endl;
             }
             else {
@@ -43,9 +48,9 @@ void SyntaxAnalyzer::SubProgram() {
 
 void SyntaxAnalyzer::StatementTable() {
     Statement();
-    NextNotPop();                           // <----
+    NextNotPop();
     while (cur_word_ == ";") {
-        Next();                             // <----
+        Next();
 
         if (words_.front() != "integer") {
             break;
@@ -60,9 +65,9 @@ void SyntaxAnalyzer::StatementTable() {
 
 void SyntaxAnalyzer::ExecutionTable() {
     Execution();
-    NextNotPop();                          // <----
-    while ( cur_word_ == ";") {            //     -
-        Next();                            // <----
+    NextNotPop();
+    while ( cur_word_ == ";") {
+        Next();
 
         Execution();
         NextNotPop();
@@ -73,15 +78,19 @@ void SyntaxAnalyzer::ExecutionTable() {
 void SyntaxAnalyzer::Statement() {
     Next();
     if (cur_word_ == "integer") {
-        NextNotPop();                         //  <----
-        if ( cur_word_ == "function") {       //      -
-            Next();                           //  <----
+        NextNotPop();
+        if ( cur_word_ == "function") {
+            Next();
 
 
             Symbol();
+            AddPro(cur_word_);
+
             Next();
             if ( cur_word_ == "(") {
                 Parameter();
+                AddVar(PARAMETER);
+
                 Next();
                 if ( cur_word_ == ")") {
                     Next();
@@ -102,6 +111,8 @@ void SyntaxAnalyzer::Statement() {
         }
         else {
             Variable();
+
+            AddVar(VARIABLE);
         }
     }
     else {
@@ -112,14 +123,18 @@ void SyntaxAnalyzer::Statement() {
 void SyntaxAnalyzer::FunctionBody() {
     Next();
     if ( cur_word_ == "begin") {
+
+
         StatementTable();
-        //Statement();
-        //Next();                                       // <====================
+
         if ( cur_word_ == ";") {
             ExecutionTable();
-            //Execution();
             Next();
-            if (cur_word_ != "end") {
+            if (cur_word_ == "end") {
+                PrintVars();
+                DelPro();
+
+            } else {
                 Error("[ERROR] -- 2: begin end not match");
             }
         }
@@ -141,6 +156,7 @@ void SyntaxAnalyzer::Execution() {
         Next();
         if ( cur_word_ == "(") {
             Variable();
+            CheckVar();
             Next();
             if (cur_word_ != ")") {
                 Error("[ERROR] -- 2: lack of \")\"");
@@ -173,6 +189,7 @@ void SyntaxAnalyzer::Execution() {
     }
     else {
         Variable();
+        CheckVar();
         Next();
         if ( cur_word_ == ":=" ) {
             ArithmeticExpression();
@@ -230,6 +247,7 @@ void SyntaxAnalyzer::Factor() {
     else if (cur_char_ > 'a' && cur_char_ < 'z'
              || cur_char_ > 'A' && cur_char_ < 'Z') {
         Symbol();
+
 
         NextNotPop();
         if ( cur_word_ == "(") {
