@@ -23,7 +23,7 @@ class SyntaxAnalyzer {
 
 public:
     SyntaxAnalyzer(string name)
-            :fin_(name)
+            :fin_(name), ferr_(util::ChangeSuffix(name, ERROR_SUFFIX))
     {
         Init();
     }
@@ -86,6 +86,7 @@ private:
     void Error(string info)
     {
         cout << "***LINE:" << cur_line_num_ << "  " << info << endl;
+        ferr_ << "***LINE:" << cur_line_num_ << "  " << info << endl;
         exit(0);
     }
 
@@ -150,6 +151,7 @@ private:
 
 private:
     ifstream           fin_;
+    ofstream           ferr_;
     queue<string>      words_;
     queue<string>      line_nums_;
     string             cur_word_;

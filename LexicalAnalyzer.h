@@ -28,22 +28,11 @@ public:
 
     bool LexAnalyze();
 
-    bool IsEOF() {
-        return fin_.eof();
-    }
 
     void Close() {
         fin_.close();
         fout_.close();
         ferr_.close();
-    }
-
-    char GetCharacter() {
-        return character_;
-    }
-
-    string GetToken() {
-        return token_;
     }
 
     string ToString(short type_num) {
